@@ -3,6 +3,8 @@ from telebot import types
 
 TOKEN = '7007092230:AAHAxYMq8GxCESJrjxCBfixYnzTA3XP_OMU'
 bot = telebot.TeleBot(TOKEN)
+
+
 @bot.message_handler(commands=['info', 'start', 'help'])
 def send_welcome(message):
     bot.reply_to(message,
@@ -18,7 +20,8 @@ def send_options(message):
     btn_si = types.InlineKeyboardButton("Sí", callback_data="si")
     btn_no = types.InlineKeyboardButton("No", callback_data="no")
     markup.add(btn_si, btn_no)
-    bot.send_message(message.chat.id, "Core abierto?", reply_markup=markup)
+    bot.new_message = bot.send_message(message.chat.id, "Core abierto?", reply_markup=markup)
+
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -32,8 +35,10 @@ def callback_query(call):
             buttons = [types.InlineKeyboardButton(hour, callback_data=hour) for hour in row]
             markup.row(*buttons)
         bot.send_message(call.message.chat.id, "Hasta qué hora? (±)", reply_markup=markup)
+        bot.delete_message(bot.new_message.chat.id, bot.new_message.message_id)
     elif call.data == "no":
         bot.reply_to(bot.msg, "Core NO está abierto :(")
+        bot.delete_message(bot.new_message.chat.id, bot.new_message.message_id)
     else:
         bot.reply_to(bot.msg, f"CORE ABIERTO hasta las {call.data}")
 
